@@ -253,6 +253,31 @@ export type GetDailyPlan500 = {
   code: string;
 };
 
+export type CompleteAllDailyPlanTask200TasksItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  isCompleted: boolean;
+};
+
+export type CompleteAllDailyPlanTask200 = {
+  tasks: CompleteAllDailyPlanTask200TasksItem[];
+};
+
+export type CompleteAllDailyPlanTask401 = {
+  error: string;
+  code: string;
+};
+
+export type CompleteAllDailyPlanTask404 = {
+  error: string;
+  code: string;
+};
+
+export type CompleteAllDailyPlanTask500 = {
+  error: string;
+  code: string;
+};
+
 export type GetHomeData200TodayPlanningCompletedTasksItem = {
   title: string;
 };
@@ -707,6 +732,62 @@ export const getDailyPlan = async (
     {
       ...options,
       method: "GET",
+    },
+  );
+};
+
+/**
+ * @summary Mark all tasks in a daily plan as completed
+ */
+export type completeAllDailyPlanTaskResponse200 = {
+  data: CompleteAllDailyPlanTask200;
+  status: 200;
+};
+
+export type completeAllDailyPlanTaskResponse401 = {
+  data: CompleteAllDailyPlanTask401;
+  status: 401;
+};
+
+export type completeAllDailyPlanTaskResponse404 = {
+  data: CompleteAllDailyPlanTask404;
+  status: 404;
+};
+
+export type completeAllDailyPlanTaskResponse500 = {
+  data: CompleteAllDailyPlanTask500;
+  status: 500;
+};
+
+export type completeAllDailyPlanTaskResponseSuccess =
+  completeAllDailyPlanTaskResponse200 & {
+    headers: Headers;
+  };
+export type completeAllDailyPlanTaskResponseError = (
+  | completeAllDailyPlanTaskResponse401
+  | completeAllDailyPlanTaskResponse404
+  | completeAllDailyPlanTaskResponse500
+) & {
+  headers: Headers;
+};
+
+export type completeAllDailyPlanTaskResponse =
+  | completeAllDailyPlanTaskResponseSuccess
+  | completeAllDailyPlanTaskResponseError;
+
+export const getCompleteAllDailyPlanTaskUrl = (id: string) => {
+  return `/daily-plan/complete-all-task/${id}`;
+};
+
+export const completeAllDailyPlanTask = async (
+  id: string,
+  options?: RequestInit,
+): Promise<completeAllDailyPlanTaskResponse> => {
+  return customFetch<completeAllDailyPlanTaskResponse>(
+    getCompleteAllDailyPlanTaskUrl(id),
+    {
+      ...options,
+      method: "PATCH",
     },
   );
 };

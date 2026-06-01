@@ -49,16 +49,21 @@ export default async function Home() {
           <h2 className="font-space-grotesk font-bold text-2xl text-foreground">
             Planejamento de Hoje
           </h2>
-          <Button
-            variant="link"
-            className="p-0 h-auto text-sm font-normal underline"
-          >
-            ver planejamento semanal
-          </Button>
+          {planning ? (
+            <Button variant="link" className="p-0 h-auto text-sm font-normal underline" asChild>
+              <Link href={`/weekly-plans/${planning.planningId}`}>
+                ver planejamento semanal
+              </Link>
+            </Button>
+          ) : (
+            <Button variant="link" className="p-0 h-auto text-sm font-normal underline" disabled>
+              ver planejamento semanal
+            </Button>
+          )}
         </div>
 
         {planning ? (
-          <Link href="#">
+          <Link href={`/weekly-plans/${planning.planningId}/days/${planning.id}`}>
             <DailyPlanCard weekDay={planning.weekDay} tasksCount={totalTasks} />
           </Link>
         ) : (
