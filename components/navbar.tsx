@@ -11,7 +11,9 @@ export function Navbar() {
         <div className="bg-home-hero rounded-full p-3.5">
           <Sparkles className="size-7 text-background" />
         </div>
-        <CircleUser className="size-7 text-background/70 stroke-[1.5]" />
+        <Link href="/profile" aria-label="Perfil">
+          <CircleUser className="size-7 text-background/70 stroke-[1.5]" />
+        </Link>
       </div>
     </nav>
   );
