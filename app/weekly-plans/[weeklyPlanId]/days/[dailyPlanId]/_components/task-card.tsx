@@ -2,6 +2,7 @@
 
 import { useTransition } from "react";
 import { Check, Sparkles } from "lucide-react";
+import { parseAsBoolean, parseAsString, useQueryState } from "nuqs";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { GetDailyPlan200TasksItem } from "@/app/_lib/api/fetch-generated";
@@ -24,6 +25,14 @@ interface TaskCardProps {
 
 export function TaskCard({ task, weeklyPlanId, dailyPlanId }: TaskCardProps) {
   const [isPending, startTransition] = useTransition();
+  const [, setIsOpen] = useQueryState(
+    "chat_open",
+    parseAsBoolean.withDefault(false),
+  );
+  const [, setInitialMessage] = useQueryState(
+    "chat_initial_message",
+    parseAsString.withDefault(""),
+  );
 
   const toggleComplete = () => {
     startTransition(async () => {
@@ -35,11 +44,18 @@ export function TaskCard({ task, weeklyPlanId, dailyPlanId }: TaskCardProps) {
     });
   };
 
+  const handleAiClick = () => {
+    setInitialMessage(
+      `Quais as melhores formas de otimizar a executção da tarefa ${task.title}?`,
+    );
+    setIsOpen(true);
+  };
+
   return (
     <div
       className={cn(
         "rounded-[20px] border border-foreground p-5 flex flex-col gap-4",
-        task.isCompleted ? "bg-auth-brand" : "bg-background"
+        task.isCompleted ? "bg-auth-brand" : "bg-background",
       )}
     >
       <div className="flex items-start justify-between gap-3">
@@ -47,7 +63,7 @@ export function TaskCard({ task, weeklyPlanId, dailyPlanId }: TaskCardProps) {
           <p
             className={cn(
               "font-bold text-lg text-foreground leading-tight",
-              task.isCompleted && "line-through"
+              task.isCompleted && "line-through",
             )}
           >
             {task.title}
@@ -63,7 +79,7 @@ export function TaskCard({ task, weeklyPlanId, dailyPlanId }: TaskCardProps) {
             "shrink-0 rounded-full size-8 border border-foreground p-0",
             task.isCompleted
               ? "bg-home-hero hover:bg-home-hero/90"
-              : "bg-task-unchecked hover:bg-task-unchecked/90"
+              : "bg-task-unchecked hover:bg-task-unchecked/90",
           )}
         >
           {task.isCompleted && <Check className="size-4 text-background" />}
@@ -80,6 +96,7 @@ export function TaskCard({ task, weeklyPlanId, dailyPlanId }: TaskCardProps) {
           variant="ghost"
           size="icon"
           className="bg-home-hero hover:bg-home-hero/90 rounded-full size-12 p-0"
+          onClick={handleAiClick}
         >
           <Sparkles className="size-5 text-background" />
         </Button>

@@ -378,6 +378,49 @@ export type PostAiBody = {
   messages: unknown[];
 };
 
+/**
+ * @nullable
+ */
+export type GetMe200 = {
+  userId: string;
+  userName: string;
+  /**
+   * @minimum -9007199254740991
+   * @maximum 9007199254740991
+   */
+  reasonForProcrastination: number;
+} | null;
+
+export type GetMe401 = {
+  error: string;
+  code: string;
+};
+
+export type GetMe500 = {
+  error: string;
+  code: string;
+};
+
+export type ListReasonsForProcrastination200Item = {
+  reasonId: string;
+  /**
+   * @minimum -9007199254740991
+   * @maximum 9007199254740991
+   */
+  reasonNumber: number;
+  reasonText: string;
+};
+
+export type ListReasonsForProcrastination401 = {
+  error: string;
+  code: string;
+};
+
+export type ListReasonsForProcrastination500 = {
+  error: string;
+  code: string;
+};
+
 export type Get200 = {
   message: string;
 };
@@ -975,6 +1018,93 @@ export const postAi = async (
     headers: { "Content-Type": "application/json", ...options?.headers },
     body: JSON.stringify(postAiBody),
   });
+};
+
+/**
+ * @summary Get current user reason for procrastination data
+ */
+export type getMeResponse200 = {
+  data: GetMe200;
+  status: 200;
+};
+
+export type getMeResponse401 = {
+  data: GetMe401;
+  status: 401;
+};
+
+export type getMeResponse500 = {
+  data: GetMe500;
+  status: 500;
+};
+
+export type getMeResponseSuccess = getMeResponse200 & {
+  headers: Headers;
+};
+export type getMeResponseError = (getMeResponse401 | getMeResponse500) & {
+  headers: Headers;
+};
+
+export type getMeResponse = getMeResponseSuccess | getMeResponseError;
+
+export const getGetMeUrl = () => {
+  return `/me/`;
+};
+
+export const getMe = async (options?: RequestInit): Promise<getMeResponse> => {
+  return customFetch<getMeResponse>(getGetMeUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+/**
+ * @summary List all available reasons for procrastination
+ */
+export type listReasonsForProcrastinationResponse200 = {
+  data: ListReasonsForProcrastination200Item[];
+  status: 200;
+};
+
+export type listReasonsForProcrastinationResponse401 = {
+  data: ListReasonsForProcrastination401;
+  status: 401;
+};
+
+export type listReasonsForProcrastinationResponse500 = {
+  data: ListReasonsForProcrastination500;
+  status: 500;
+};
+
+export type listReasonsForProcrastinationResponseSuccess =
+  listReasonsForProcrastinationResponse200 & {
+    headers: Headers;
+  };
+export type listReasonsForProcrastinationResponseError = (
+  | listReasonsForProcrastinationResponse401
+  | listReasonsForProcrastinationResponse500
+) & {
+  headers: Headers;
+};
+
+export type listReasonsForProcrastinationResponse =
+  | listReasonsForProcrastinationResponseSuccess
+  | listReasonsForProcrastinationResponseError;
+
+export const getListReasonsForProcrastinationUrl = () => {
+  return `/reasons-for-procrastination/`;
+};
+
+export const listReasonsForProcrastination = async (
+  options?: RequestInit,
+): Promise<listReasonsForProcrastinationResponse> => {
+  return customFetch<listReasonsForProcrastinationResponse>(
+    getListReasonsForProcrastinationUrl(),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
 };
 
 /**
