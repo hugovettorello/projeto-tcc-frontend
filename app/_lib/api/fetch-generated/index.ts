@@ -186,6 +186,7 @@ export type GetWeeklyPlan200DailyPlansItem = {
    * @maximum 9007199254740991
    */
   tasksCount: number;
+  allTasksCompleted: boolean;
 };
 
 export type GetWeeklyPlan200 = {

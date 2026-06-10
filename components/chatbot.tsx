@@ -1,13 +1,22 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { parseAsBoolean, parseAsString, useQueryState } from "nuqs";
 import { Send, Sparkles, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { Streamdown } from "streamdown";
 import { cn } from "@/lib/utils";
+
+const messageSchema = z.object({
+  message: z.string().min(1),
+});
 
 export function Chatbot() {
   const [isOpen, setIsOpen] = useQueryState(
@@ -18,9 +27,13 @@ export function Chatbot() {
     "chat_initial_message",
     parseAsString.withDefault(""),
   );
-  const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const hasSentInitialRef = useRef(false);
+
+  const form = useForm<z.infer<typeof messageSchema>>({
+    resolver: zodResolver(messageSchema),
+    defaultValues: { message: "" },
+  });
 
   const { messages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({
@@ -46,12 +59,11 @@ export function Chatbot() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSend = () => {
-    const text = input.trim();
-    if (!text || status === "streaming") return;
-    sendMessage({ text });
-    setInput("");
-  };
+  const handleSend = form.handleSubmit(({ message }) => {
+    if (status === "streaming") return;
+    sendMessage({ text: message });
+    form.reset();
+  });
 
   const handleSuggestedMessage = (text: string) => {
     sendMessage({ text });
@@ -137,25 +149,36 @@ export function Chatbot() {
 
         <div className="h-px bg-border" />
 
-        <div className="p-4 flex items-center gap-3">
-          <input
-            className="flex-1 bg-muted rounded-full px-5 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none"
-            placeholder="Digite sua mensagem"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleSend();
-            }}
-          />
-          <Button
-            size="icon"
-            className="bg-home-hero hover:bg-home-hero/90 rounded-full size-12 shrink-0"
-            onClick={handleSend}
-            disabled={status === "streaming"}
+        <Form {...form}>
+          <form
+            onSubmit={handleSend}
+            className="p-4 flex items-center gap-3"
           >
-            <Send className="size-5 text-background" />
-          </Button>
-        </div>
+            <FormField
+              control={form.control}
+              name="message"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormControl>
+                    <Input
+                      {...field}
+                      className="bg-muted rounded-full px-5 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none border-none shadow-none focus-visible:ring-0"
+                      placeholder="Digite sua mensagem"
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <Button
+              type="submit"
+              size="icon"
+              className="bg-home-hero hover:bg-home-hero/90 rounded-full size-12 shrink-0"
+              disabled={status === "streaming"}
+            >
+              <Send className="size-5 text-background" />
+            </Button>
+          </form>
+        </Form>
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import {
   getDailyPlan,
   completeAllDailyPlanTask,
 } from "@/app/_lib/api/fetch-generated";
+import { redirectIfOnboardingRequired } from "@/app/_lib/check-onboarding";
 import { DailyPlanCard } from "@/app/_components/daily-plan-card";
 import { Navbar } from "@/components/navbar";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,8 @@ export default async function DailyPlanPage({ params }: Props) {
   });
 
   if (!session?.data?.user) redirect("/auth");
+
+  await redirectIfOnboardingRequired();
 
   const result = await getDailyPlan(weeklyPlanId, dailyPlanId);
 

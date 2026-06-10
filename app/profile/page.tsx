@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Image from "next/image";
 import { authClient } from "@/app/_lib/auth-client";
 import { getNumberOfCompletedDays } from "@/app/_lib/api/fetch-generated";
+import { redirectIfOnboardingRequired } from "@/app/_lib/check-onboarding";
 import { Navbar } from "@/components/navbar";
 import { BackButton } from "./_components/back-button";
 import { SignOutButton } from "./_components/sign-out-button";
@@ -13,6 +14,8 @@ export default async function ProfilePage() {
   });
 
   if (!session?.data?.user) redirect("/auth");
+
+  await redirectIfOnboardingRequired();
 
   const result = await getNumberOfCompletedDays();
   const numberOfDays = result.status === 200 ? result.data.numberOfDays : 0;

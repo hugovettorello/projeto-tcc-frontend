@@ -4,6 +4,7 @@ import Link from "next/link";
 import dayjs from "dayjs";
 import { authClient } from "./_lib/auth-client";
 import { getHomeData } from "./_lib/api/fetch-generated";
+import { redirectIfOnboardingRequired } from "./_lib/check-onboarding";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Navbar } from "@/components/navbar";
@@ -17,6 +18,8 @@ export default async function Home() {
   });
 
   if (!session?.data?.user) redirect("/auth");
+
+  await redirectIfOnboardingRequired();
 
   const homeData = await getHomeData(dayjs().format("YYYY-MM-DD"));
 

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { authClient } from "@/app/_lib/auth-client";
 import { getWeeklyPlan } from "@/app/_lib/api/fetch-generated";
+import { redirectIfOnboardingRequired } from "@/app/_lib/check-onboarding";
 import { DailyPlanCard } from "@/app/_components/daily-plan-card";
 import { Navbar } from "@/components/navbar";
 import { BackButton } from "./_components/back-button";
@@ -20,11 +21,18 @@ export default async function WeeklyPlanPage({ params }: Props) {
 
   if (!session?.data?.user) redirect("/auth");
 
+  await redirectIfOnboardingRequired();
+
   const result = await getWeeklyPlan(weeklyPlanId);
 
   if (result.status !== 200) redirect("/");
 
   const weeklyPlan = result.data;
+
+  const weekDayOrder = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
+  const sortedDailyPlans = [...weeklyPlan.dailyPlans].sort(
+    (a, b) => weekDayOrder.indexOf(a.weekDay) - weekDayOrder.indexOf(b.weekDay),
+  );
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -36,7 +44,7 @@ export default async function WeeklyPlanPage({ params }: Props) {
       </div>
 
       <div className="flex-1 px-5 pb-24 flex flex-col gap-4 pt-2">
-        {weeklyPlan.dailyPlans.map((dailyPlan) => (
+        {sortedDailyPlans.map((dailyPlan) => (
           <Link
             key={dailyPlan.id}
             href={`/weekly-plans/${weeklyPlanId}/days/${dailyPlan.id}`}
@@ -45,6 +53,8 @@ export default async function WeeklyPlanPage({ params }: Props) {
               weekDay={dailyPlan.weekDay}
               tasksCount={dailyPlan.tasksCount}
               backgroundImage="/plan-background.jpg"
+              isRest={dailyPlan.isRest}
+              allTasksCompleted={dailyPlan.allTasksCompleted}
             />
           </Link>
         ))}
