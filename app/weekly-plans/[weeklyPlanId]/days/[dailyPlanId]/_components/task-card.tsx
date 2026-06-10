@@ -29,6 +29,10 @@ export function TaskCard({ task, weeklyPlanId, dailyPlanId }: TaskCardProps) {
     "chat_open",
     parseAsBoolean.withDefault(false),
   );
+  const [, setTaskId] = useQueryState(
+    "chat_task_id",
+    parseAsString.withDefault(""),
+  );
   const [, setInitialMessage] = useQueryState(
     "chat_initial_message",
     parseAsString.withDefault(""),
@@ -45,8 +49,9 @@ export function TaskCard({ task, weeklyPlanId, dailyPlanId }: TaskCardProps) {
   };
 
   const handleAiClick = () => {
+    setTaskId(task.id);
     setInitialMessage(
-      `Quais as melhores formas de otimizar a executção da tarefa ${task.title}?`,
+      `Quais as melhores formas de otimizar a execução da tarefa ${task.title}?`,
     );
     setIsOpen(true);
   };

@@ -6,7 +6,6 @@ import { authClient } from "./_lib/auth-client";
 import { getHomeData } from "./_lib/api/fetch-generated";
 import { redirectIfOnboardingRequired } from "./_lib/check-onboarding";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Navbar } from "@/components/navbar";
 import { DailyPlanCard } from "./_components/daily-plan-card";
 
@@ -81,16 +80,19 @@ export default async function Home() {
               <h3 className="font-space-grotesk font-bold text-lg text-foreground mb-3">
                 Pendentes
               </h3>
-              <div className="flex flex-col gap-4">
-                {planning.uncompletedTasks.map((task, i) => (
-                  <div key={i} className="flex items-start gap-3">
-                    <Checkbox className="size-5 border-foreground mt-0.5" />
-                    <span className="font-bold text-sm text-foreground leading-tight">
+              {planning.uncompletedTasks.length === 0 ? (
+                <p className="text-muted-foreground text-sm">
+                  Nenhuma tarefa pendente.
+                </p>
+              ) : (
+                <div className="flex flex-col gap-4">
+                  {planning.uncompletedTasks.map((task, i) => (
+                    <span key={i} className="font-bold text-sm text-foreground leading-tight">
                       {task.title}
                     </span>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {planning.completedTasks.length > 0 && (
