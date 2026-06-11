@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Chatbot } from "@/components/chatbot";
+import { Suspense } from "react";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -37,7 +38,9 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <NuqsAdapter>
           {children}
-          <Chatbot />
+          <Suspense>
+            <Chatbot />
+          </Suspense>
         </NuqsAdapter>
       </body>
     </html>
