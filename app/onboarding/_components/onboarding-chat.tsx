@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -13,13 +13,19 @@ import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Streamdown } from "streamdown";
 import { cn } from "@/lib/utils";
+import { checkOnboardingComplete } from "../_actions";
 
 const messageSchema = z.object({
   message: z.string().min(1),
 });
 
-export function OnboardingChat() {
+type OnboardingChatProps = {
+  initialIsComplete: boolean;
+};
+
+export function OnboardingChat({ initialIsComplete }: OnboardingChatProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [isComplete, setIsComplete] = useState(initialIsComplete);
 
   const form = useForm<z.infer<typeof messageSchema>>({
     resolver: zodResolver(messageSchema),
@@ -36,6 +42,11 @@ export function OnboardingChat() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  useEffect(() => {
+    if (isComplete || status !== "ready" || messages.length === 0) return;
+    checkOnboardingComplete().then(setIsComplete);
+  }, [status, isComplete, messages.length]);
 
   const handleSend = form.handleSubmit(({ message }) => {
     if (status === "streaming") return;
@@ -62,9 +73,15 @@ export function OnboardingChat() {
             <span className="text-xs text-foreground/70">Online</span>
           </div>
         </div>
-        <Button asChild className="rounded-full shrink-0">
-          <Link href="/">Acessar PlanejAI</Link>
-        </Button>
+        {isComplete ? (
+          <Button asChild className="rounded-full shrink-0">
+            <Link href="/">Acessar PlanejAI</Link>
+          </Button>
+        ) : (
+          <Button className="rounded-full shrink-0" disabled>
+            Acessar PlanejAI
+          </Button>
+        )}
       </div>
 
       <div className="h-px bg-border" />

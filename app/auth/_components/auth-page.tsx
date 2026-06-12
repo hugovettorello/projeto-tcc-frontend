@@ -42,9 +42,15 @@ export function AuthPage() {
       </div>
 
       <div className="flex-[3] bg-gradient-to-b from-auth-card-from to-auth-card-to rounded-t-[50px] border-2 border-auth-text/20 flex flex-col justify-between px-8 pt-12 pb-10">
-        <p className="text-auth-text-dark font-bold text-5xl leading-[1.15]">
-          O seu companheiro na rotina!
-        </p>
+        <div className="flex flex-col gap-3">
+          <p className="text-auth-text-dark font-bold text-5xl leading-[1.15]">
+            O seu companheiro na rotina!
+          </p>
+          <p className="text-auth-text text-base">
+            Projeto acadêmico realizado por Cristiano da Silva Roble, Hugo
+            Vettorello e Nikolas Mesquita.
+          </p>
+        </div>
 
         <Button
           onClick={handleGoogleSignIn}

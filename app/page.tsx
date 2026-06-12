@@ -24,9 +24,6 @@ export default async function Home() {
 
   const firstName = session.data.user.name?.split(" ")[0] ?? "Usuário";
   const planning = homeData.status === 200 ? homeData.data.todayPlanning : null;
-  const totalTasks = planning
-    ? planning.completedTasks.length + planning.uncompletedTasks.length
-    : 0;
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -40,9 +37,6 @@ export default async function Home() {
               Bora organizar sua rotina?
             </p>
           </div>
-          <Button className="rounded-full bg-auth-brand text-background font-bold hover:bg-auth-brand/90 shrink-0">
-            Bora!
-          </Button>
         </div>
       </div>
 
@@ -66,7 +60,11 @@ export default async function Home() {
 
         {planning ? (
           <Link href={`/weekly-plans/${planning.planningId}/days/${planning.id}`}>
-            <DailyPlanCard weekDay={planning.weekDay} tasksCount={totalTasks} />
+            <DailyPlanCard
+              weekDay={planning.weekDay}
+              tasksCount={planning.tasksCount}
+              isRest={planning.isRest}
+            />
           </Link>
         ) : (
           <p className="text-muted-foreground text-sm">
@@ -75,46 +73,58 @@ export default async function Home() {
         )}
 
         {planning && (
-          <div className="flex gap-4">
-            <div className="flex-1">
-              <h3 className="font-space-grotesk font-bold text-lg text-foreground mb-3">
-                Pendentes
-              </h3>
-              {planning.uncompletedTasks.length === 0 ? (
-                <p className="text-muted-foreground text-sm">
-                  Nenhuma tarefa pendente.
-                </p>
-              ) : (
-                <div className="flex flex-col gap-4">
-                  {planning.uncompletedTasks.map((task, i) => (
-                    <span key={i} className="font-bold text-sm text-foreground leading-tight">
-                      {task.title}
-                    </span>
-                  ))}
+          planning.isRest ? (
+            <div className="flex flex-col items-center justify-center gap-3 py-12 text-center">
+              <p className="text-muted-foreground text-base">
+                Aproveite seu dia de descanso
+              </p>
+              <p className="text-muted-foreground/60 text-sm max-w-[260px]">
+                Nenhuma tarefa para hoje. Recarregue as energias para os
+                próximos dias.
+              </p>
+            </div>
+          ) : (
+            <div className="flex gap-4">
+              <div className="flex-1">
+                <h3 className="font-space-grotesk font-bold text-lg text-foreground mb-3">
+                  Pendentes
+                </h3>
+                {planning.uncompletedTasks.length === 0 ? (
+                  <p className="text-muted-foreground text-sm">
+                    Nenhuma tarefa pendente.
+                  </p>
+                ) : (
+                  <div className="flex flex-col gap-4">
+                    {planning.uncompletedTasks.map((task, i) => (
+                      <span key={i} className="font-bold text-sm text-foreground leading-tight">
+                        {task.title}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {planning.completedTasks.length > 0 && (
+                <div className="w-[45%]">
+                  <div className="border border-border bg-background rounded-tr-[20px] px-4 py-3">
+                    <h3 className="font-space-grotesk font-bold text-lg text-foreground">
+                      Concluídos
+                    </h3>
+                  </div>
+                  <div className="bg-home-hero px-4 py-4 flex flex-col gap-3">
+                    {planning.completedTasks.map((task, i) => (
+                      <p
+                        key={i}
+                        className="font-bold text-background text-sm leading-tight"
+                      >
+                        {task.title}
+                      </p>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
-
-            {planning.completedTasks.length > 0 && (
-              <div className="w-[45%]">
-                <div className="border border-border bg-background rounded-tr-[20px] px-4 py-3">
-                  <h3 className="font-space-grotesk font-bold text-lg text-foreground">
-                    Concluídos
-                  </h3>
-                </div>
-                <div className="bg-home-hero px-4 py-4 flex flex-col gap-3">
-                  {planning.completedTasks.map((task, i) => (
-                    <p
-                      key={i}
-                      className="font-bold text-background text-sm leading-tight"
-                    >
-                      {task.title}
-                    </p>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+          )
         )}
       </div>
 

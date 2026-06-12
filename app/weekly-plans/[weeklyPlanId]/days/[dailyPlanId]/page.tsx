@@ -50,28 +50,46 @@ export default async function DailyPlanPage({ params }: Props) {
       </div>
 
       <div className="flex-1 px-5 pb-24 flex flex-col gap-4">
-        <DailyPlanCard weekDay={dailyPlan.weekDay} title={dailyPlan.title} />
+        <DailyPlanCard
+          weekDay={dailyPlan.weekDay}
+          title={dailyPlan.title}
+          isRest={dailyPlan.isRest}
+        />
 
-        {dailyPlan.tasks.map((task) => (
-          <TaskCard
-            key={task.id}
-            task={task}
-            weeklyPlanId={weeklyPlanId}
-            dailyPlanId={dailyPlanId}
-          />
-        ))}
+        {dailyPlan.isRest ? (
+          <div className="flex-1 flex flex-col items-center justify-center gap-3 py-12 text-center">
+            <p className="text-muted-foreground text-base">
+              Aproveite seu dia de descanso
+            </p>
+            <p className="text-muted-foreground/60 text-sm max-w-[260px]">
+              Nenhuma tarefa para hoje. Recarregue as energias para os próximos
+              dias.
+            </p>
+          </div>
+        ) : (
+          <>
+            {dailyPlan.tasks.map((task) => (
+              <TaskCard
+                key={task.id}
+                task={task}
+                weeklyPlanId={weeklyPlanId}
+                dailyPlanId={dailyPlanId}
+              />
+            ))}
 
-        <div className="flex justify-center pt-2">
-          <form action={completeAllTasks}>
-            <Button
-              type="submit"
-              variant="outline"
-              className="rounded-[15px] border-foreground font-normal px-8"
-            >
-              Marcar todas como concluídas
-            </Button>
-          </form>
-        </div>
+            <div className="flex justify-center pt-2">
+              <form action={completeAllTasks}>
+                <Button
+                  type="submit"
+                  variant="outline"
+                  className="rounded-[15px] border-foreground font-normal px-8"
+                >
+                  Marcar todas como concluídas
+                </Button>
+              </form>
+            </div>
+          </>
+        )}
       </div>
 
       <Navbar />
